@@ -1,0 +1,73 @@
+name: Cloudflare Zero Trust Sync
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_ENV: production
+
+jobs:
+  cgps:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    permissions:
+      contents: read
+    env:
+      ALLOWLIST_URLS: ${{ vars.ALLOWLIST_URLS }}
+      BLOCKLIST_URLS: ${{ vars.BLOCKLIST_URLS }}
+      BLOCK_PAGE_ENABLED: ${{ vars.BLOCK_PAGE_ENABLED }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_LIST_ITEM_LIMIT: ${{ secrets.CLOUDFLARE_LIST_ITEM_LIMIT }}
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      PING_URL: ${{ secrets.PING_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: ".node-version"
+
+      - name: Validate required Cloudflare secrets
+        run: |
+          missing=0
+
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::error::Missing required secret CLOUDFLARE_API_TOKEN"
+            missing=1
+          fi
+
+          if [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::error::Missing required secret CLOUDFLARE_ACCOUNT_ID"
+            missing=1
+          fi
+
+          if [ "$missing" -ne 0 ]; then
+            exit 1
+          fi
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Download lists and sync Cloudflare Zero Trust
+        run: npm run cloudflare-refresh
+
+      - name: Send ping request
+        if: env.PING_URL != ''
+        run: curl --fail --silent --show-error "$PING_URL"
+
+  keepalive:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - uses: liskin/gh-workflow-keepalive@v1

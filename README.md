@@ -47,6 +47,8 @@ Cloudflare Gateway allows you to create custom rules to filter HTTP, DNS, and ne
 
 These scripts can be run using GitHub Actions so your filters will be automatically updated and pushed to Cloudflare Gateway. This is useful if you are using a frequently updated blocklist.
 
+This repository now includes a ready-to-run workflow at `.github/workflows/cloudflare-zero-trust-sync.yml` that runs once every 24 hours at 03:00 UTC and can also be started manually with `workflow_dispatch`.
+
 Please note that:
 - GitHub Actions wasn't intended to be used for this purpose, therefore the local options are recommended.
 - the GitHub Action downloads the recommended blocklists and whitelist by default. You can change this behavior by setting Actions variables.
@@ -62,7 +64,7 @@ Please note that:
    - `ALLOWLIST_URLS`: Uses your own allowlists. One URL per line. Recommended allowlists will be used if this variable is not provided.
    - `BLOCKLIST_URLS`: Uses your own blocklists. One URL per line. Recommended blocklists will be used if this variable is not provided.
    - `BLOCK_PAGE_ENABLED`: Enable showing block page if host is blocked.
-4. Create a new file in the repository named `.github/workflows/main.yml` with the contents of `auto_update_github_action.yml` found in this repository. The default settings will update your filters every week at 3 AM UTC. You can change this by editing the `schedule` property.
+4. Create a new file in the repository named `.github/workflows/main.yml` with the contents of `auto_update_github_action.yml` found in this repository. The default settings will update your filters every 24 hours at 3 AM UTC. You can change this by editing the `schedule` property.
 5. Enable GitHub Actions in your repository settings.
 
 ### DNS setup for Cloudflare Gateway
