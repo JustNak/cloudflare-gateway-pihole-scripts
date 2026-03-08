@@ -38,7 +38,7 @@ Cloudflare Gateway allows you to create custom rules to filter HTTP, DNS, and ne
 1. Clone this repository.
 2. Run `npm install` to install dependencies.
 3. Copy `.env.example` to `.env` and fill in the values.
-4. If you haven't downloaded any filters yourself, run the `node download_lists.js` command to download recommended filter lists (OISD Small and AdAway; about 50 000 domains).
+4. If you haven't downloaded any filters yourself, run the `node download_lists.js` command to download the recommended filter lists (HaGeZi Multi PRO wildcard domains, tuned for the 300,000 free-plan limit).
 5. Run `node cf_list_create.js` to create the lists in Cloudflare Gateway. This will take a while.
 6. Run `node cf_gateway_rule_create.js` to create the firewall rule in Cloudflare Gateway.
 7. Profit! Time is money after all. You can update the lists by repeating steps 4, 5 and 6.
@@ -53,17 +53,24 @@ Please note that:
 
 1. Create a new empty, private repository. Forking or public repositories are discouraged, but supported - although the script never leaks your API keys and GitHub Actions secrets are automatically redacted from the logs, it's better to be safe than sorry. There is **no need to use the "Sync fork" button** if you're doing that! The GitHub Action downloads the latest code regardless of what's in your forked repository.
 2. Create the following GitHub Actions secrets in your repository settings:
-   - `CLOUDFLARE_API_TOKEN`: Your Cloudflare API Token with Zero Trust read and edit permissions
-   - `CLOUDFLARE_ACCOUNT_ID`: Your Cloudflare account ID
-   - `CLOUDFLARE_LIST_ITEM_LIMIT`: The maximum number of blocked domains allowed for your Cloudflare Zero Trust plan. Default to 300,000. Optional if you are using the free plan.
-   - `PING_URL`: /Optional/ The HTTP(S) URL to ping (using curl) after the GitHub Action has successfully updated your filters. Useful for monitoring.
-   - `DISCORD_WEBHOOK_URL`: /Optional/ The Discord (or similar) webhook URL to send notifications to. Good for monitoring as well.
+   - `CLOUDFLARE_API_TOKEN` (**required**): Cloudflare API token scoped to your account with:
+     - **Account permissions**: `Zero Trust` = `Edit` (this also includes read access needed by the scripts)
+     - **Account resources**: `Include` -> `All accounts` (or your specific account)
+   - `CLOUDFLARE_ACCOUNT_ID` (**required**): Your Cloudflare account ID.
+   - `CLOUDFLARE_LIST_ITEM_LIMIT` (optional): The maximum number of blocked domains allowed for your Cloudflare Zero Trust plan. Use `300000` for the free plan.
+   - `PING_URL` (optional): HTTP(S) URL to ping (using curl) after successful updates. Useful for monitoring.
+   - `DISCORD_WEBHOOK_URL` (optional): Discord (or similar) webhook URL for progress/error notifications.
 3. Create the following GitHub Actions variables in your repository settings if you desire:
-   - `ALLOWLIST_URLS`: Uses your own allowlists. One URL per line. Recommended allowlists will be used if this variable is not provided.
-   - `BLOCKLIST_URLS`: Uses your own blocklists. One URL per line. Recommended blocklists will be used if this variable is not provided.
+   - `ALLOWLIST_URLS`: Uses your own allowlists (whitelist configuration in this project). One URL per line. If this variable is not provided, built-in recommended allowlists are used to prevent common breakage.
+   - `BLOCKLIST_URLS`: Uses your own blocklists. One URL per line. If this variable is not provided, the built-in default is HaGeZi Multi PRO (`pro-onlydomains.txt`).
    - `BLOCK_PAGE_ENABLED`: Enable showing block page if host is blocked.
 4. Create a new file in the repository named `.github/workflows/main.yml` with the contents of `auto_update_github_action.yml` found in this repository. The default settings will update your filters every week at 3 AM UTC. You can change this by editing the `schedule` property.
 5. Enable GitHub Actions in your repository settings.
+6. Run the first update manually:
+   - Open your repository on GitHub.
+   - Go to the **Actions** tab.
+   - Select the **Update Filter Lists** workflow.
+   - Click **Run workflow** -> **Run workflow** on the `main` branch.
 
 ### DNS setup for Cloudflare Gateway
 
