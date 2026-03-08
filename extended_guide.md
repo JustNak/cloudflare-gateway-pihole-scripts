@@ -24,7 +24,7 @@ Cloudflare API Token can be created in your [Cloudflare profile](https://dash.cl
 
 1. Click "Create Token" and click "Get Started" in the "Create Custom Token" row.
 2. Enter any name for your token
-3. Add Zero Trust Read and Edit permissions for your account
+3. Add account permission `Zero Trust` with access level `Edit` and include your Cloudflare account in Account Resources
 4. Click "Continue to summary" and click "Create Token"
 5. You will see the created API Token
 
@@ -33,6 +33,10 @@ Cloudflare API Token can be created in your [Cloudflare profile](https://dash.cl
 #### `CLOUDFLARE_LIST_ITEM_LIMIT`
 
 The Cloudflare list item limit is the maximum number of items (blocked domains) that can be added to Cloudflare. The default value of 300,000 is the maximum allowed by Cloudflare for free accounts. If you pay for Cloudflare Zero Trust, you might be able to increase this value.
+
+#### `ALLOWLIST_URLS` (whitelist equivalent)
+
+This project does not use a `whitelist.ini` file. Instead, it uses `ALLOWLIST_URLS` (or local `allowlist.txt`) as the whitelist configuration. If `ALLOWLIST_URLS` is not set, built-in recommended allowlists are used to reduce common breakage.
 
 ### Other
 
