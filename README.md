@@ -51,7 +51,7 @@ Please note that:
 - GitHub Actions wasn't intended to be used for this purpose, therefore the local options are recommended.
 - the GitHub Action downloads the recommended blocklists and whitelist by default. You can change this behavior by setting Actions variables.
 
-1. Create a new empty, private repository. Forking or public repositories are discouraged, but supported - although the script never leaks your API keys and GitHub Actions secrets are automatically redacted from the logs, it's better to be safe than sorry. There is **no need to use the "Sync fork" button** if you're doing that! The GitHub Action downloads the latest code regardless of what's in your forked repository.
+1. Fork this repository (recommended) or create a new empty, private repository. If creating an empty repository, note that you will need to add the workflow file manually as described in step 4. **The GitHub Action automatically downloads the latest scripts from this repository each time it runs.**
 2. Create the following GitHub Actions secrets in your repository settings:
    - `CLOUDFLARE_API_TOKEN`: Your Cloudflare API Token with Zero Trust read and edit permissions
    - `CLOUDFLARE_ACCOUNT_ID`: Your Cloudflare account ID
@@ -62,7 +62,7 @@ Please note that:
    - `ALLOWLIST_URLS`: Uses your own allowlists. One URL per line. Recommended allowlists will be used if this variable is not provided.
    - `BLOCKLIST_URLS`: Uses your own blocklists. One URL per line. Recommended blocklists will be used if this variable is not provided.
    - `BLOCK_PAGE_ENABLED`: Enable showing block page if host is blocked.
-4. Create a new file in the repository named `.github/workflows/main.yml` with the contents of `auto_update_github_action.yml` found in this repository. The default settings will update your filters every week at 3 AM UTC. You can change this by editing the `schedule` property.
+4. If you created a new empty repository, create a new file named `.github/workflows/main.yml` with the contents of [`auto_update_github_action.yml`](auto_update_github_action.yml) found in this repository. If you forked this repository, the workflow is already present at `.github/workflows/main.yml`. The default settings will update your filters every week at 3 AM UTC. You can change this by editing the `schedule` property.
 5. Enable GitHub Actions in your repository settings.
 
 ### DNS setup for Cloudflare Gateway
